@@ -1,0 +1,236 @@
+import json
+import tkinter as tk
+from tkinter import *
+from tkinter import messagebox
+from PIL import Image, ImageTk
+session=False
+######################
+info={}
+def readjson():
+    with open("info.json") as f:
+        info = json.load(f)
+        return info
+def writejson(info):
+    with open("info.json", "w") as f:
+        json.dump(info, f)
+######################
+def open_window():
+    root = tk.Tk()
+    root.title("Sign in")
+    root.geometry("926x490+205+115")
+    root.configure(bg="#fff")
+    root.resizable(False,False)
+    
+    main_frame = tk.Frame(root)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    image = Image.open("bp24.png") 
+    image = image.resize((926,490)) 
+    photo = ImageTk.PhotoImage(image)
+        
+    label = tk.Label(main_frame, image=photo)
+    label.pack(side=tk.LEFT, padx=0, pady=0)
+    #___________________________   
+    def sign_in():
+        global session
+        username = user.get()
+        password = code.get()
+        info=readjson()
+        if session!=False:
+            messagebox.showerror("Invalid", "you are already logged in!")
+        if (username in info) and (info[username]==password):
+            session=username
+            screen = Toplevel(root)
+            screen.title("App")
+            screen.geometry("926x490+205+115")
+            screen.config(bg="white")
+            screen.resizable(False,False)
+            Label(screen,text = "You are already logged in.",bg = "#fff",font = ("Calibri(body)",20,"bold")).pack(expand = True)
+            screen.mainloop()
+
+        elif username!="admin" and password!="1234":
+            messagebox.showerror("Invalid", "invalid Username and Password")
+
+        elif password!="1234":
+            messagebox.showerror("Invalid", "invalid Password")
+        elif username!="admin":
+            messagebox.showerror("Invalid", "invalid Usernam")
+#_______________________________________________________________________________
+    def sign_up():
+        screen2 = Toplevel(root)
+        screen2.title("Submit")
+        screen2.geometry("700x600+300+60")
+        screen2.config(bg="white")
+        screen2.resizable(False,False)
+        def validation(user,pas,cpas):
+            if pas!=cpas:
+                messagebox.showerror("Invalid", "password and confirmation mismatch")
+                return False
+            if len(pas)<8:
+                messagebox.showerror("Invalid", "password length at least 8 char!")
+                return False
+            if user in info:
+                messagebox.showerror("Invalid", "username a;ready exist!")
+                return False
+            return True
+        def sign_up1():
+            username1 = user1.get()
+            password1 = code1.get()
+            password2 = code2.get()
+            result=validation(username1,password1,password2)
+
+            info = readjson()
+            if result==True :  
+                info[username1]=password1
+                writejson(info)
+                screen3 = Toplevel(screen2)
+                screen3.title("App")
+                screen3.geometry("700x600+300+60")
+                screen3.config(bg="white")
+                screen3.resizable(False,False)
+                Label(screen3,text = "Submit done.",bg = "#fff",font = ("Calibri(body)",20,"bold")).pack(expand = True)
+                screen3.mainloop()    
+#________________________________________________________________________
+        main_frame = tk.Frame(screen2)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        image = Image.open("signup1.jpg") 
+        image = image.resize((700,700)) 
+        photo = ImageTk.PhotoImage(image)
+        
+        label = tk.Label(main_frame, image=photo)
+        label.pack(side=tk.LEFT, padx=0, pady=0)
+
+        frame_width = 350
+        frame_height = 310
+        frame = tk.Frame(screen2, width=frame_width, height=frame_height,bg="white")
+        frame.place(x=180,y=150)
+        
+        Button(screen2,width = 39,pady = 7,text="Sign up",bg = "#57a1f8",fg = "white",border = 0,cursor = "hand2",command = sign_up1).place(x = 215,y = 370)
+
+        sign_up_label = tk.Label(screen2,text = "Sign up",bg="white",font = ("Arial",20))
+        sign_up_label.place(x = 305,y = 170)
+
+        def on_enter(e):
+            user1.delete(0,"end")
+        def on_leave(e):
+            name=user1.get()
+            if name=="":
+                user1.insert(0,"Username")    
+    
+        user1 = Entry(screen2,width = 37,fg = "black",border = 0,bg = "white",font = ("Microsoft YaHei UI Light",11))
+        user1.place(x = 205,y = 235)
+        user1.insert(0,"Username")
+        user1.bind("<FocusIn>", on_enter)
+        user1.bind("<FocusOut>",on_leave)
+
+        Frame(screen2,width = 295,height = 2,bg = "black").place(x = 207,y = 260)
+        
+        def on_enter(e):
+            code1.delete(0,"end")
+        def on_leave(e):
+            name=code1.get()
+            if name=="":
+                code1.insert(0,"Password")  
+        
+        code1 = Entry(screen2,width = 37,fg = "black",border = 0,bg = "white",font = ("Microsoft YaHei UI Light",11),)
+        code1.place(x = 205,y = 275)
+        code1.insert(0,"Password",)
+        code1.bind("<FocusIn>",on_enter)
+        code1.bind("<FocusOut>",on_leave)
+
+        Frame(screen2,width = 295,height = 2,bg = "black").place(x = 207,y = 300)
+
+        def on_enter(e):
+            code2.delete(0,"end")
+        def on_leave(e):
+            name=code2.get()
+            if name=="":
+                code2.insert(0,"Enter pass again")  
+        
+        code2 = Entry(screen2,width = 37,fg = "black",border = 0,bg = "white",font = ("Microsoft YaHei UI Light",11),)
+        code2.place(x = 205,y = 315)
+        code2.insert(0,"Enter password again",)
+        code2.bind("<FocusIn>",on_enter)
+        code2.bind("<FocusOut>",on_leave)
+
+        Frame(screen2,width = 295,height = 2,bg = "black").place(x = 207,y = 340)
+        
+        Button(width = 39,pady = 7,text="Sign up",bg = "#57a1f8",fg = "white",border = 0,cursor = "hand2",command = sign_up).place(x = 333,y = 293)
+
+        screen2.mainloop()
+#______________________________________________________________________________
+    def delete():
+        global session
+        if session==False:
+            messagebox.showerror("Invalid", "please login first!")
+            return
+        screen4 = Toplevel(root)
+        screen4.title("Delete")
+        screen4.geometry("355x270+500+230")
+        screen4.config(bg="white")
+        screen4.resizable(False,False)
+        delete_label = tk.Label(screen4,text = "Do you want to delete your account?",bg="white",font = ("Arial",15))
+        delete_label.place(x = 15,y = 50)
+        Frame(screen4,width = 310,height = 2,bg = "black").place(x = 20,y = 80)
+        
+        if session=="admin":
+            messagebox.showerror("Invalid", "admin account is not removable")
+            return
+        def yes():
+            global session
+            info = readjson()
+            info.pop(session)
+            writejson(info)
+            messagebox.showinfo("Delete", "your account has been deleted!")
+            session=False
+    
+        def delete():
+            messagebox.showinfo("Invalid","canceled by user!")
+            return
+        Button(screen4,width = 12,text = "Yes",bg = "#57a1f8",fg = "black",border = 0,cursor = "hand2",command = yes).place(x = 50,y = 160)
+        Button(screen4,width = 12,text = "No",bg = "gray",fg = "black",border = 0,cursor = "hand2",command = delete).place(x = 210,y = 160)
+
+        screen4.mainloop()   
+    #________________________________
+    sign_in_label = tk.Label(root,text = "Sign in",font = ("Arial",20))
+    sign_in_label.place(x = 420,y = 80)
+    #________________________________
+    def on_enter(e):
+        user.delete(0,"end")
+    def on_leave(e):
+        name=user.get()
+        if name=="":
+            user.insert(0,"Username")    
+    
+    user = Entry(width = 37,fg = "black",border = 0,bg = "white",font = ("Microsoft YaHei UI Light",11))
+    user.place(x = 325,y = 160)
+    user.insert(0,"Username")
+    user.bind("<FocusIn>", on_enter)
+    user.bind("<FocusOut>",on_leave)
+
+    Frame(width = 295,height = 2,bg = "black").place(x = 325,y = 185)
+    #___________________________________
+    def on_enter(e):
+        code.delete(0,"end")
+    def on_leave(e):
+        name=code.get()
+        if name=="":
+            code.insert(0,"Password")  
+        
+    code = Entry(width = 37,fg = "black",border = 0,bg = "white",font = ("Microsoft YaHei UI Light",11),)
+    code.place(x = 325,y = 200)
+    code.insert(0,"Password",)
+    code.bind("<FocusIn>",on_enter)
+    code.bind("<FocusOut>",on_leave)
+
+    Frame(width = 295,height = 2,bg = "black").place(x = 325,y = 225)
+    #_____________________________________
+    Button(width = 39,pady = 7,text = "Sign in",bg = "#57a1f8",fg = "white",border = 0,cursor = "hand2",command = sign_in).place(x = 333,y = 253)
+    
+    Button(width = 39,pady = 7,text="Sign up",bg = "#57a1f8",fg = "white",border = 0,cursor = "hand2",command = sign_up).place(x = 333,y = 293)
+
+    Button(width = 39,pady = 7,text = "Delete",bg = "#57a1f8",fg = "white",border = 0,cursor = "hand2",command = delete).place(x = 333,y = 333)
+
+    root.mainloop()        
+open_window()
